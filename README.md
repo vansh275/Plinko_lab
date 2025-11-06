@@ -54,14 +54,14 @@ This is a take-home assignment to build a provably-fair, interactive Plinko game
 * **Language:** **TypeScript**
 * **Fairness Engine:**
     * **Hashing:** Node.js built-in `crypto` module for **SHA-256**.
-    * **PRNG:** A custom **`xorshift32`** implementation, as recommended by the test vectors[cite: 118].
+    * **PRNG:** A custom **`xorshift32`** implementation, as recommended by the test vectors.
 * **Animation:** **HTML Canvas** with a `requestAnimationFrame` loop to create a deterministic animation that follows the backend's path.
 
 ---
 
 ## 🎲 Fairness Specification
 
-This project implements a **Commit-Reveal** protocol to ensure provably-fair outcomes[cite: 25].
+This project implements a **Commit-Reveal** protocol to ensure provably-fair outcomes.
 
 1.  **Commit Phase:** The server generates a secret `serverSeed` and `nonce`, and publishes a `commitHex`.
     * `commitHex = SHA256(serverSeed + ":" + nonce)`
@@ -69,12 +69,12 @@ This project implements a **Commit-Reveal** protocol to ensure provably-fair out
 2.  **Play Phase:** The user provides a `clientSeed`. The server combines them to create a master seed.
     * `combinedSeed = SHA256(serverSeed + ":" + clientSeed + ":" + nonce)`
 
-3.  **PRNG:** A `xorshift32` pseudo-random number generator is seeded using the **first 4 bytes (big-endian)** of the `combinedSeed`[cite: 118].
+3.  **PRNG:** A `xorshift32` pseudo-random number generator is seeded using the **first 4 bytes (big-endian)** of the `combinedSeed`.
 
-4.  **Deterministic Engine:** The game is 100% deterministic based on this PRNG stream[cite: 34, 47].
-    * **Peg Map:** The 12-row `pegMap` is generated first. Each peg's `leftBias` is calculated using the formula `0.5 + (rand() - 0.5) * 0.2` and rounded to 6 decimal places for stable hashing[cite: 41, 120].
-    * **Drop Influence:** The `dropColumn` provides a small bias adjustment: `leftBiasAdj = (dropColumn - 6) * 0.01`[cite: 44].
-    * **Path:** The ball's path is calculated. At each row, a new `rand()` is drawn; if `rnd < (bias + leftBiasAdj)`, the ball moves Left, otherwise Right. The final `binIndex` is the total number of Right moves[cite: 45].
+4.  **Deterministic Engine:** The game is 100% deterministic based on this PRNG stream.
+    * **Peg Map:** The 12-row `pegMap` is generated first. Each peg's `leftBias` is calculated using the formula `0.5 + (rand() - 0.5) * 0.2` and rounded to 6 decimal places for stable hashing.
+    * **Drop Influence:** The `dropColumn` provides a small bias adjustment: `leftBiasAdj = (dropColumn - 6) * 0.01`.
+    * **Path:** The ball's path is calculated. At each row, a new `rand()` is drawn; if `rnd < (bias + leftBiasAdj)`, the ball moves Left, otherwise Right. The final `binIndex` is the total number of Right moves.
 
 5.  **Verification:** The public `/verify` page re-runs this entire computation using the (now public) `serverSeed`, `clientSeed`, `nonce`, and `dropColumn` to prove the `binIndex` was correct and not tampered with.
 
@@ -98,7 +98,7 @@ Per the assignment’s encouragement, I leveraged an AI assistant to accelerate 
 
 ## ⏱️ Time Log (Rough Estimate)
 
-The assignment suggested a timebox of ~8 hours[cite: 6].
+The assignment suggested a timebox of ~8 hours.
 
 * **Project Setup & Core Logic (2.5 hours):** Setting up the project, implementing the `xorshift32` PRNG, and writing the core fairness functions (`getCommitHex`, `getCombinedSeed`). Getting the unit tests to pass the provided vectors.
 * **Backend & API (1.5 hours):** Building the Prisma schema and all Next.js API endpoints (`/commit`, `/start`, `/reveal`, `/verify`).
@@ -112,6 +112,6 @@ The assignment suggested a timebox of ~8 hours[cite: 6].
 
 Given more time, I would focus on:
 
-* **Better Physics:** Replace the simple canvas animation with a proper physics library like **Matter.js**, as suggested in the stretch goals[cite: 50]. I would still use the deterministic `path` to "nudge" the ball, ensuring the outcome remains provably fair.
-* **UI Polish:** Add the "bin pulse + confetti on landing" animation [cite: 19] and spend more time on a fully responsive mobile layout.
-* **Bonus Features:** Implement one of the bonus features, like a realtime session log of recent rounds[cite: 109, 151].
+* **Better Physics:** Replace the simple canvas animation with a proper physics library like **Matter.js**, as suggested in the stretch goals. I would still use the deterministic `path` to "nudge" the ball, ensuring the outcome remains provably fair.
+* **UI Polish:** Add the "bin pulse + confetti on landing" animation  and spend more time on a fully responsive mobile layout.
+* **Bonus Features:** Implement one of the bonus features, like a realtime session log of recent rounds.
