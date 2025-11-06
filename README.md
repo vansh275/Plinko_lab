@@ -85,16 +85,17 @@ This project implements a **Commit-Reveal** protocol to ensure provably-fair out
 Per the assignment’s encouragement, I leveraged an AI assistant to accelerate development and bridge gaps in my familiarity with the specific tech stack. My primary focus was on directing the core logic and architecture.
 
 * **Understanding & Scaffolding:**
-  I used the AI to summarize and understand the assignment’s requirements. Since I am newer to Next.js and TypeScript, I used the AI to provide correct syntax and generate boilerplate for API routes and React components.
+    I used the AI to summarize and understand the assignment’s requirements. Since I am newer to Next.js and TypeScript, I used the AI to provide correct syntax and generate boilerplate for API routes and React components. The AI was also used to help draft this README file based on the completed project's code and features.
 
 * **Code Snippets:**
-  To speed up the process, I used the AI for a few specific code snippets. Most notably, the **`xorshift32` PRNG implementation was fully written by the AI** based on the assignment’s test vector requirements.
+    To speed up the process, I used the AI for a few specific code snippets. Most notably, the **`xorshift32` PRNG implementation was fully written by the AI** based on the assignment’s test vector requirements.
 
 * **Logic & Concepts:**
-  The **overall logic, data flow, and conceptual design were my own**. I directed the AI on *how* the deterministic engine should work, *what* the API endpoints needed to do, and *how* the components should interact.
+    The **overall logic, data flow, and conceptual design were my own**. I directed the AI on *how* the deterministic engine should work, *what* the API endpoints needed to do, and *how* the components should interact.
 
 * **Debugging:**
-  The AI was helpful in debugging complex issues, particularly the React re-render loops (which required `useCallback`) that occurred when toggling sound or the debug grid.
+    The AI was helpful in debugging complex issues, particularly the React re-render loops (which required `useCallback`) that occurred when toggling sound or the debug grid.
+
 
 
 ## ⏱️ Time Log (Rough Estimate)
