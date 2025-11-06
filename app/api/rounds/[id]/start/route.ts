@@ -3,8 +3,11 @@ import prisma from '@/lib/prisma';
 import { combinedSeedFromParts, seedPRNG } from '@/utils/prng';
 import { runPlinkoGame } from '@/lib/engine';
 
-// (Requirement D) A simple, symmetric payout table for bins 0-12
-// Edges pay more, center pays less.
+/**
+ * A fixed, symmetric payout map for the 13 possible bins (0-12).
+ * The edges (0 and 12) have the highest multipliers, while the center (6)
+ * has the lowest, as per the assignment's suggestion.
+ */
 const PAYOUT_MAP = [
     10,  // Bin 0
     5,   // Bin 1
@@ -21,13 +24,26 @@ const PAYOUT_MAP = [
     10,  // Bin 12
 ];
 
-// Define the expected request body
+/**
+ * Defines the expected shape of the JSON body for a "start game" request.
+ */
 interface StartRequest {
     clientSeed: string;
     betCents: number;
     dropColumn: number;
 }
 
+/**
+ * API Route: POST /api/rounds/[id]/start
+ *
+ * This is the main game-play endpoint. It takes a `roundId` (from the 'commit'
+ * step) and the user's inputs (`clientSeed`, `betCents`, `dropColumn`).
+ * It then runs the deterministic game engine, calculates the result,
+ * and saves it to the database.
+ *
+ * @returns A JSON object with the public game results (binIndex, path, etc.).
+ * Crucially, it **does not** return the `serverSeed`.
+ */
 export async function POST(
     request: Request,
     context: { params: { id: string } }
@@ -35,19 +51,28 @@ export async function POST(
     const { id } = await context.params;
     const roundId = id;
 
-
     try {
         const { clientSeed, betCents, dropColumn }: StartRequest = await request.json();
 
-        // 1. Find the round that was created in the 'commit' step
+        /**
+         * 1. Fetch the round created during the 'commit' step.
+         */
         const round = await prisma.round.findUnique({
             where: { id: roundId },
         });
 
+        /**
+         * 2. Validate the round.
+         */
         if (!round) {
             return NextResponse.json({ error: 'Round not found.' }, { status: 404 });
         }
 
+        /**
+         * 3. Ensure the round hasn't been played.
+         * The status must be 'CREATED'. If it's 'STARTED' or 'REVEALED',
+         * the game cannot be played.
+         */
         if (round.status !== 'CREATED') {
             return NextResponse.json(
                 { error: 'Round already started or finished.' },
@@ -55,7 +80,9 @@ export async function POST(
             );
         }
 
-        // The serverSeed was stored during commit, but must not be null
+        /**
+         * 4. Sanity check for the server seed.
+         */
         if (!round.serverSeed) {
             return NextResponse.json(
                 { error: 'Server seed missing from round.' },
@@ -63,26 +90,30 @@ export async function POST(
             );
         }
 
-        // --- Run the Verified Game Logic ---
+        /**
+         * 5. Run the Provably-Fair Deterministic Engine
+         */
 
-        // 2. Generate the combinedSeed
+        // 5a. Generate the master seed from all three parts.
         const combinedSeed = combinedSeedFromParts(
             round.serverSeed,
             clientSeed,
             round.nonce
         );
 
-        // 3. Create the PRNG
+        // 5b. Create the deterministic PRNG from the master seed.
         const prng = seedPRNG(combinedSeed);
 
-        // 4. Run the deterministic engine!
+        // 5c. Run the game engine to get the final path and bin.
         const { pegMapHash, binIndex, path } = runPlinkoGame(prng, dropColumn);
-        // --- MODIFY THIS ---
-        // Look up the payout from the map using the final binIndex
-        const payoutMultiplier = PAYOUT_MAP[binIndex] || 0; // Default to 0 if out of bounds
-        // --- END MODIFY ---
 
-        // 5. Update the round in the database with the results
+        // 5d. Look up the payout from our fixed map.
+        const payoutMultiplier = PAYOUT_MAP[binIndex] || 0;
+
+        /**
+         * 6. Update the round in the database with the results.
+         * The status is moved to 'STARTED', and all game data is recorded.
+         */
         const updatedRound = await prisma.round.update({
             where: { id: roundId },
             data: {
@@ -98,8 +129,10 @@ export async function POST(
             },
         });
 
-        // 6. Return the non-secret results to the frontend
-        // DO NOT return the serverSeed.
+        /**
+         * 7. Return the public, non-secret results to the frontend.
+         * This data is used to render the animation and show the result.
+         */
         return NextResponse.json({
             roundId: updatedRound.id,
             pegMapHash: updatedRound.pegMapHash,

@@ -1,26 +1,262 @@
-@import "tailwindcss";
+/**
+ * ========================================================================
+ * Global Stylesheet
+ *
+ * 1. Base Setup & Theming
+ * 2. Layout & Responsive Breakpoints
+ * 3. Typography & Links
+ * 4. Forms & Controls
+ * 5. Button Components
+ * 6. Game Board & Canvas
+ * 7. Payout Table
+ * 8. Utility & Info Sections
+ * ========================================================================
+ */
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/**
+ * 1. Base Setup & Theming
+ *
+ * Establishes a dark theme, a sane font-family stack, and a
+ * responsive base padding for the entire application.
+ */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  margin: 0;
+  padding: 1rem;
+  line-height: 1.6;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/**
+ * 2. Layout & Responsive Breakpoints
+ *
+ * Defines the main content container and responsive adjustments.
+ */
+
+/* The main app container, centered with a max-width. */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  border: 1px solid #333;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Increases padding on larger screens (tablets and up). */
+@media (min-width: 600px) {
+  body {
+    padding: 2rem;
+  }
+
+  .container {
+    padding: 2rem;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/**
+ * 3. Typography & Links
+ *
+ * Base styles for headings and anchor tags.
+ */
+h1 {
+  color: #ffffff;
+  border-bottom: 2px solid #333;
+  padding-bottom: 0.5rem;
+}
+
+a {
+  color: #4CAF50;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/**
+ * 4. Forms & Controls
+ *
+ * Styles for the main game controls (inputs, labels).
+ */
+
+/* A responsive grid for the main game inputs. */
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  align-items: flex-end;
+  margin: 2rem 0;
+}
+
+/* A container for a single label/input pair. */
+.control-group {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-bottom: 0.5rem;
+}
+
+input[type="text"],
+input[type="number"] {
+  background-color: #2c2c2c;
+  border: 1px solid #444;
+  color: #e0e0e0;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+input:focus {
+  outline: 2px solid #4CAF50;
+  border-color: #4CAF50;
+}
+
+/**
+ * 5. Button Components
+ *
+ * Base button styles, including hover, active, and disabled states.
+ */
+button {
+  background-color: #4CAF50;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  background-color: #444;
+  color: #888;
+  cursor: not-allowed;
+}
+
+/**
+ * 6. Game Board & Canvas
+ *
+ * Styles for the main interactive plinko area, including the
+ * canvas, placeholder, and responsive constraints.
+ */
+
+/* Container for the game canvas and overlays. */
+.plinko-area {
+  position: relative;
+  border: 1px solid #333;
+  background-color: #2c2c2c;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+  /* Enforces a 5:6 aspect ratio. */
+  aspect-ratio: 5 / 6;
+  /* Prevents the board from overflowing on short screens. */
+  max-height: 70vh;
+  /* Centers the board if height is the constraining factor. */
+  margin: 0 auto;
+}
+
+/* The canvas element where the game is rendered. */
+.plinko-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: #2c2c2c;
+}
+
+/* Placeholder for the plinko board (e.g., when loading). */
+.plinko-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #888;
+}
+
+/* Overlay to display the game result. */
+.plinko-result-overlay {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+}
+
+/**
+ * 7. Payout Table
+ *
+ * Defines the layout for the 13 payout bins at the bottom.
+ */
+
+/* Grid container for the payout bins. */
+.payout-table {
+  display: grid;
+  /* Creates 15 equal columns for spacing. */
+  grid-template-columns: repeat(15, 1fr);
+  gap: 2px;
+  background: #121212;
+  margin-top: 1rem;
+}
+
+/* A single payout bin. */
+.payout-bin {
+  padding: 8px 4px;
+  background-color: #2c2c2c;
+  border: 1px solid #333;
+  text-align: center;
+}
+
+/* Starts the first bin at the 2nd grid line, creating an empty spacer on the left. */
+.payout-bin:first-child {
+  grid-column-start: 2;
+}
+
+.payout-bin-index {
+  font-size: 0.8rem;
+  color: #aaa;
+}
+
+.payout-bin-value {
+  font-weight: bold;
+  color: #4CAF50;
+}
+
+/**
+ * 8. Utility & Info Sections
+ *
+ * Styles for the fairness info/footer area.
+ */
+.fairness-info {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #333;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+/* Styles for inline code/hash display. */
+.fairness-info code {
+  background: #2c2c2c;
+  padding: 2px 5px;
+  border-radius: 4px;
+  color: #e0e0e0;
 }

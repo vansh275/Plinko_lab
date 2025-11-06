@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
+/**
+ * API Route: POST /api/rounds/[id]/reveal
+ *
+ * Handles the final step of the provably-fair game flow.
+ * This endpoint takes a round ID, validates its state,
+ * and then "reveals" the secret `serverSeed` to the client
+ * so that the round's outcome can be independently verified.
+ */
 export async function POST(
     request: Request,
     context: { params: { id: string } }
@@ -9,41 +17,57 @@ export async function POST(
     const roundId = id;
 
     try {
-        // 1. Find the round
+        /**
+         * 1. Fetch the specified round from the database.
+         * We only select the 'status' and 'serverSeed' for security,
+         * performance, and to validate the round's state.
+         */
         const round = await prisma.round.findUnique({
             where: { id: roundId },
-            // Select only the fields we need
             select: {
                 status: true,
                 serverSeed: true,
             },
         });
 
+        /**
+         * 2. Handle cases where the round doesn't exist.
+         */
         if (!round) {
             return NextResponse.json({ error: 'Round not found.' }, { status: 404 });
         }
 
-        // 2. Check if the game has been played (status 'STARTED')
+        /**
+         * 3. Validate the round's status.
+         * A round can only be revealed if it has been 'STARTED' (played)
+         * but not yet 'REVEALED'. If it's 'CREATED' or already 'REVEALED',
+         * we return an error.
+         */
         if (round.status !== 'STARTED') {
-            // If it's 'CREATED', it hasn't been played.
-            // If it's 'REVEALED', it's already done.
             return NextResponse.json(
                 { error: 'Round is not in a state to be revealed.' },
-                { status: 400 }
+                { status: 400 } // 400 Bad Request
             );
         }
 
-        // 3. Update the status to 'REVEALED'
+        /**
+         * 4. Update the round's status to 'REVEALED'.
+         * This logs the reveal time and prevents the round from being
+         * revealed or played again.
+         */
         await prisma.round.update({
             where: { id: roundId },
             data: {
                 status: 'REVEALED',
-                revealedAt: new Date(), // Log when it was revealed
+                revealedAt: new Date(),
             },
         });
 
-        // 4. Return the serverSeed
-        // This is the key part for the verifier page
+        /**
+         * 5. Return the secret serverSeed.
+         * The client can now use this (along with their clientSeed and
+         * the nonce) to verify the game's outcome on the /verify page.
+         */
         return NextResponse.json({
             serverSeed: round.serverSeed,
         });

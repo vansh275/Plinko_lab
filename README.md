@@ -84,17 +84,15 @@ This project implements a **Commit-Reveal** protocol to ensure provably-fair out
 
 Per the assignment’s encouragement, I leveraged an AI assistant to accelerate development and bridge gaps in my familiarity with the specific tech stack. My primary focus was on directing the core logic and architecture.
 
-* **Understanding & Scaffolding:**
-    I used the AI to summarize and understand the assignment’s requirements. Since I am newer to Next.js and TypeScript, I used the AI to provide correct syntax and generate boilerplate for API routes and React components. The AI was also used to help draft this README file based on the completed project's code and features.
+* **Conceptual Guidance and Documentation:** I used the AI to initially summarize and fully understand the assignment’s complex requirements. Furthermore, the AI was instrumental in drafting this entire README and ensuring that **every file now contains clean, professional comments**, significantly improving code quality and readability.
 
-* **Code Snippets:**
-    To speed up the process, I used the AI for a few specific code snippets. Most notably, the **`xorshift32` PRNG implementation was fully written by the AI** based on the assignment’s test vector requirements.
+* **Frontend Development (Scaffolding & Syntax):** Since I am newer to Next.js and TypeScript, I used the AI to provide correct syntax, manage configuration details, and quickly generate the boilerplate for API routes and most of the core React components.
 
-* **Logic & Concepts:**
-    The **overall logic, data flow, and conceptual design were my own**. I directed the AI on *how* the deterministic engine should work, *what* the API endpoints needed to do, and *how* the components should interact.
+* **Backend Logic and Ownership:**
+    * **Core Logic (`/lib` files):** The overall data flow and conceptual design were my own. I directed the AI on *how* the deterministic engine should work and *what* the API endpoints needed to achieve.
+    * **AI-Authored Code:** The **`xorshift32` PRNG implementation and related functions were fully written by the AI** based strictly on the assignment’s test vector requirements. All code generated for the `/lib` directory was subsequently **verified by me** using the provided unit tests to guarantee correctness.
 
-* **Debugging:**
-    The AI was helpful in debugging complex issues, particularly the React re-render loops (which required `useCallback`) that occurred when toggling sound or the debug grid.
+* **Debugging:** The AI was helpful in debugging complex issues, particularly the persistent React re-render loops (which required `useCallback` adjustments) that occurred when handling state changes for sound and the debug grid.
 
 
 

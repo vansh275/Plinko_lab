@@ -1,9 +1,11 @@
-'use client'; // This is a client component
+'use client'; // This is a client component, handling user interaction and state.
 
 import { useState } from 'react';
 import Link from 'next/link';
 
-// Type for the API response from /api/verify
+/**
+ * Defines the structure for the re-computed data returned by the /api/verify endpoint.
+ */
 type VerificationResult = {
     commitHex: string;
     combinedSeed: string;
@@ -12,26 +14,36 @@ type VerificationResult = {
     path: string[];
 };
 
+/**
+ * The Plinko Verifier Page component.
+ * It provides a form for users to input game parameters and re-compute
+ * the deterministic outcome to prove the game's fairness.
+ */
 export default function VerifyPage() {
-    // --- Form State ---
+    // State variables for capturing user input (the game seeds/inputs).
     const [serverSeed, setServerSeed] = useState('');
     const [clientSeed, setClientSeed] = useState('');
     const [nonce, setNonce] = useState('');
     const [dropColumn, setDropColumn] = useState('6');
 
-    // --- UI State ---
+    // State variables for managing the UI status.
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<VerificationResult | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // Handle the "Verify" button click
+    /**
+     * Handles the form submission event.
+     * Calls the GET /api/verify route for deterministic re-computation.
+     *
+     * @param e - The React form submission event.
+     */
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); // Prevent default form submission
+        e.preventDefault(); // Prevent default browser form submission.
         setIsLoading(true);
         setResult(null);
         setError(null);
 
-        // 1. Build the query parameters
+        // 1. Construct the query string using URLSearchParams.
         const params = new URLSearchParams({
             serverSeed,
             clientSeed,
@@ -40,24 +52,27 @@ export default function VerifyPage() {
         });
 
         try {
-            // 2. Call the GET /api/verify endpoint
+            // 2. Execute the fetch request to the verification API endpoint.
             const response = await fetch(`/api/verify?${params.toString()}`);
             const data = await response.json();
 
             if (response.ok) {
-                // 3. Show the re-computed results
+                // 3. Store the successful re-computed results.
                 setResult(data);
             } else {
-                // Show an error if the API call failed
+                // Handle server-side validation or computation errors.
                 setError(data.error || 'Failed to verify.');
             }
         } catch (err) {
+            // Handle network or unknown client-side fetch errors.
             setError('An unknown error occurred.');
         }
         setIsLoading(false);
     };
 
-    // --- Render (JSX) ---
+    /**
+     * Renders the verification form and displays the re-computed results.
+     */
     return (
         <main style={{ padding: '2rem', fontFamily: 'sans-serif', maxWidth: '800px' }}>
             <h1>Plinko Verifier</h1>
@@ -134,10 +149,12 @@ export default function VerifyPage() {
                     <p>
                         Compare these re-computed values to the ones logged in the game.
                     </p>
-                    <pre style={{ background: '#f4f4f4', padding: '1rem', overflowX: 'auto' }}>
+                    {/* Display the core hash values and results in a readable JSON format. */}
+                    <pre style={{ background: '#0000', padding: '1rem', overflowX: 'auto' }}>
                         {JSON.stringify(result, null, 2)}
                     </pre>
                     <h4>Simple Path Replay:</h4>
+                    {/* Displays the sequence of L (Left) and R (Right) decisions for traceability. */}
                     <p style={{ wordBreak: 'break-all' }}>{result.path.join(' \u2192 ')}</p>
                 </div>
             )}
