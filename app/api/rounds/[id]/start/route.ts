@@ -46,7 +46,7 @@ interface StartRequest {
  */
 export async function POST(
     request: NextRequest,
-    context: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
     // console.log("CONTEXT PARAMS:", context.params);
     const { id } = await context.params;
