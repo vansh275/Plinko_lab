@@ -4,8 +4,7 @@ This is a take-home assignment to build a provably-fair, interactive Plinko game
 
 ## 🚀 Live Links
 
-* **Live App:** `[ADD YOUR VERCEL/DEPLOYMENT URL HERE]`
-* **Verifier Page:** `[ADD YOUR VERCEL/DEPLOYMENT URL HERE]/verify`
+* **Live App:** `https://plinko-lab-388c.vercel.app/
 
 ---
 

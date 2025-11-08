@@ -260,3 +260,48 @@ button:disabled {
   border-radius: 4px;
   color: #e0e0e0;
 }
+
+
+/* 9. Project Explanation Box */
+.project-explanation {
+  background-color: #2c2c2c;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin: 2rem 0;
+}
+
+.project-explanation h2 {
+  color: #fff;
+  margin-top: 0.5rem;
+  border-bottom: 1px solid #555;
+  padding-bottom: 0.5rem;
+}
+
+.project-explanation h3 {
+  color: #e0e0e0;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.project-explanation p,
+.project-explanation li {
+  color: #ccc;
+  line-height: 1.6;
+}
+
+.project-explanation code {
+  background: #121212;
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #e0e0e0;
+}
+
+.project-explanation ol {
+  padding-left: 20px;
+}
+
+.project-explanation li {
+  margin-bottom: 0.5rem;
+}

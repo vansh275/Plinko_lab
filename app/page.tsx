@@ -209,6 +209,61 @@ export default function GamePage() {
     };
   }, [isLoading, handleDrop]);
 
+  function ProjectExplanation() {
+    return (
+      <div className="project-explanation">
+        <h3>What is this?</h3>
+        <p>
+          <strong>This is a provably-fair Plinko game, <h2>Every result is Determined *BEFORE* you play
+            and can be MATHEMATICALLY VERIFIED.</h2></strong>
+        </p>
+
+        <h3>How It Works (Commit-Reveal Protocol)</h3>
+        <ol>
+          <li>
+            <strong> Commit:</strong> When this page loaded, the server
+            generated a secret <strong>Server Seed + Nonce </strong> and showed you a
+            public "commitment" to it (the <strong>Commit Hex</strong> below).
+          </li>
+          <li>
+            <strong> Play:</strong> You provide your own{' '}
+            <strong>Client Seed</strong> (you can change it!) and also choose the <strong>Bin no.</strong> to bet on and drop the
+            ball.
+          </li>
+          <li>
+            <strong> Reveal:</strong> The server combines its secret Server
+            Seed, your Client Seed, and a <strong>Nonce</strong> to
+            deterministically calculate the ball's path using an `xorshift32`
+            PRNG.
+          </li>
+        </ol>
+
+        <h3>How to Verify Any Round</h3>
+        <ol>
+          <li>Play a game.</li>
+          <li>
+            After the ball lands,{' '}
+            <strong>open your browser console (F12)</strong>.
+          </li>
+          <li>
+            Look for the log:{' '}
+            <code>"Round Revealed! Server Seed: ..."</code> and copy the{' '}
+            <code>serverSeed</code> and <code>nonce</code>.
+          </li>
+          <li>
+            <a href="/verify" target="_blank" rel="noopener noreferrer">
+              <strong>Go to the Verifier Page</strong>
+            </a>{' '}
+            and paste in your <code>clientSeed</code>, the{' '}
+            <code>serverSeed</code>, and the <code>nonce</code>. The verifier
+            will re-run the exact same logic, proving your result was not
+            tampered with.
+          </li>
+        </ol>
+      </div>
+    );
+  }
+
   // --- Render (JSX) ---
   return (
     <main className="container">
@@ -221,6 +276,8 @@ export default function GamePage() {
 
       <h1>Plinko Lab (Provably-Fair)</h1>
       <p>Status: {isLoading ? 'Loading...' : 'Ready'}</p>
+
+      <ProjectExplanation />
 
       {/* --- Controls --- */}
       <div className="controls-grid">
