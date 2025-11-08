@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
 /**
@@ -10,8 +10,8 @@ import prisma from '@/lib/prisma';
  * so that the round's outcome can be independently verified.
  */
 export async function POST(
-    request: Request,
-    context: { params: { id: string } }
+    request: NextRequest,
+    context: { params: Promise<{ id: string }> }
 ) {
     const { id } = await context.params;
     const roundId = id;

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { combinedSeedFromParts, seedPRNG } from '@/utils/prng';
 import { runPlinkoGame } from '@/lib/engine';
@@ -45,9 +45,10 @@ interface StartRequest {
  * Crucially, it **does not** return the `serverSeed`.
  */
 export async function POST(
-    request: Request,
+    request: NextRequest,
     context: { params: { id: string } }
 ) {
+    // console.log("CONTEXT PARAMS:", context.params);
     const { id } = await context.params;
     const roundId = id;
 
