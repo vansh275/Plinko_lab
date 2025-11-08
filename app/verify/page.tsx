@@ -83,6 +83,15 @@ export default function VerifyPage() {
             <Link href="/">&larr; Back to Game</Link>
 
             <hr />
+            <div style={{ padding: '1rem', background: '#2c2c2c', borderRadius: '8px', margin: '1rem 0' }}>
+                <strong>How to find your inputs:</strong>
+                <ol style={{ paddingLeft: '20px', margin: '0.5rem 0 0 0' }}>
+                    <li>Play a full game on the main page.</li>
+                    <li>Open your browser's Developer Console (F12).</li>
+                    <li>After the ball lands, look for the log: <strong>"Round Revealed! Server Seed: ... Nonce: ..."</strong></li>
+                    <li>Copy your `clientSeed` (from the input) and the `serverSeed` and `nonce` (from the console) into the form below.</li>
+                </ol>
+            </div>
 
             {/* --- Verification Form --- */}
             <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem' }}>

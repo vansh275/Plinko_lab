@@ -114,7 +114,9 @@ export default function GamePage() {
       const data = await response.json();
 
       if (response.ok) {
-        console.log('Round Revealed! Server Seed:', data.serverSeed);
+        console.log(
+          'Round Revealed! Server Seed:', data.serverSeed, 'Nonce:', data.nonce
+        );
       } else {
         console.error('Failed to reveal round:', data.error);
       }

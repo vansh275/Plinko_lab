@@ -27,6 +27,7 @@ export async function POST(
             select: {
                 status: true,
                 serverSeed: true,
+                nonce: true,
             },
         });
 
@@ -70,6 +71,7 @@ export async function POST(
          */
         return NextResponse.json({
             serverSeed: round.serverSeed,
+            nonce: round.nonce,
         });
 
     } catch (error) {
