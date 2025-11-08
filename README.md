@@ -17,7 +17,7 @@ This is a take-home assignment to build a provably-fair, interactive Plinko game
 
 2.  **Clone the repository:**
     ```bash
-    git clone [YOUR_REPO_URL]
+    git clone [REPO_URL]
     cd plinko-lab
     ```
 
