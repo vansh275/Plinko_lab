@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 /**
  * Defines the structure for the re-computed data returned by the /api/verify endpoint.
@@ -31,6 +32,11 @@ export default function VerifyPage() {
     const [result, setResult] = useState<VerificationResult | null>(null);
     const [error, setError] = useState<string | null>(null);
 
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const roundId = searchParams.get("oldRoundId");
+    console.log("roundid", roundId);
+
     /**
      * Handles the form submission event.
      * Calls the GET /api/verify route for deterministic re-computation.
@@ -49,15 +55,18 @@ export default function VerifyPage() {
             clientSeed,
             nonce,
             dropColumn,
+            roundId: roundId ?? '',
         });
 
         try {
             // 2. Execute the fetch request to the verification API endpoint.
             const response = await fetch(`/api/verify?${params.toString()}`);
             const data = await response.json();
+            // console.log(data);
 
             if (response.ok) {
                 // 3. Store the successful re-computed results.
+                //check fxn
                 setResult(data);
             } else {
                 // Handle server-side validation or computation errors.

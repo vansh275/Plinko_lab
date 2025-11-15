@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import PlinkoBoard from '@/app/components/PlinkoBoard';
 import { useReducedMotion } from '@/app/hooks/useReducedMotion';
+import { useRouter } from 'next/navigation';
 
 const PAYOUT_MAP = [
   10, 5, 2, 1.5, 1, 0.5, 0.2, 0.5, 1, 1.5, 2, 5, 10
@@ -31,11 +32,12 @@ type GameResult = {
 
 export default function GamePage() {
   // --- Game State ---
-  const [roundId, setRoundId] = useState<string | null>(null);
+  const [roundId, setRoundId] = useState('');
   const [commitHex, setCommitHex] = useState<string | null>(null);
   const [clientSeed, setClientSeed] = useState<string>('candidate-hello');
   const [betAmount, setBetAmount] = useState<number>(100); // in cents
   const [dropColumn, setDropColumn] = useState<number>(6); // 0-12
+  const [oldRoundId, setOldRoundId] = useState('');
 
   // --- UI State ---
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -47,6 +49,7 @@ export default function GamePage() {
   const prefersReducedMotion = useReducedMotion();
   const audioWin = useRef<HTMLAudioElement | null>(null);
   const audioTick = useRef<HTMLAudioElement | null>(null);
+  const router = useRouter();
 
   // Initialize audio on component mount
   useEffect(() => {
@@ -114,15 +117,19 @@ export default function GamePage() {
       const data = await response.json();
 
       if (response.ok) {
-        console.log(
-          'Round Revealed! Server Seed:', data.serverSeed, 'Nonce:', data.nonce
-        );
+        console.log("Revealed");
+        console.log("Server Seed: ", data.serverSeed);
+        console.log("Nonce: ", data.nonce);
+
       } else {
         console.error('Failed to reveal round:', data.error);
       }
     } catch (error) {
       console.error('Reveal request failed:', error);
     }
+    // console.log("in handleReveal ", id);
+    setOldRoundId(id);
+    console.log("handleReveal set oldroundId ", oldRoundId);
     commitNewRound();
   }, [commitNewRound]);
 
@@ -169,6 +176,8 @@ export default function GamePage() {
     console.log('Animation finished!');
     playWin(); // <-- Play win sound
     if (roundId) {
+      // console.log("id at handleAnimationComplete", roundId);
+      // oldRoundId = roundId;
       handleReveal(roundId);
     }
   }, [roundId, handleReveal, playWin]);
@@ -208,6 +217,21 @@ export default function GamePage() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isLoading, handleDrop]);
+
+  function handleVerify(event) {
+    event.preventDefault();
+    console.log("old ID ", oldRoundId);
+    if (!oldRoundId || oldRoundId.length == 0) {
+      console.log("oldRoundID empty");
+    }
+    const params = new URLSearchParams({
+      oldRoundId,
+    });
+
+    const url = `/verify?${params.toString()}`;
+
+    router.push(url);
+  }
 
   function ProjectExplanation() {
     return (
@@ -251,7 +275,7 @@ export default function GamePage() {
             <code>serverSeed</code> and <code>nonce</code>.
           </li>
           <li>
-            <a href="/verify" target="_blank" rel="noopener noreferrer">
+            <a href="/verify" target="_blank" rel="noopener noreferrer" onClick={(e) => handleVerify(e)}>
               <strong>Go to the Verifier Page</strong>
             </a>{' '}
             and paste in your <code>clientSeed</code>, the{' '}
@@ -364,7 +388,7 @@ export default function GamePage() {
           <strong>Commit Hex:</strong> <code>{commitHex || '...'}</code>
         </p>
         <p>
-          <a href="/verify" target="_blank" rel="noopener noreferrer">
+          <a href="/verify" target="_blank" rel="noopener noreferrer" onClick={(e) => handleVerify(e)}>
             Go to Verifier Page
           </a>
         </p>

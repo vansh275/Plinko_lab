@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { combinedSeedFromParts, commitHexFromParts, seedPRNG } from '@/utils/prng';
 import { runPlinkoGame } from '@/lib/engine';
+import prisma from '@/lib/prisma';
 
 /**
  * API Route: GET /api/verify
@@ -17,8 +18,9 @@ import { runPlinkoGame } from '@/lib/engine';
  * This endpoint does NOT interact with the database.
  */
 export async function GET(request: Request) {
-    console.log(request);
+    // console.log(request);
     const { searchParams } = new URL(request.url);
+    console.log(searchParams);
 
     /**
      * 1. Extract all required inputs from the URL query parameters.
@@ -27,16 +29,25 @@ export async function GET(request: Request) {
     const clientSeed = searchParams.get('clientSeed');
     const nonce = searchParams.get('nonce');
     const dropColumnStr = searchParams.get('dropColumn');
+    const roundId = searchParams.get("roundId");
+    console.log("roundId in api/verify ", roundId);
 
     /**
      * 2. Validate that all required parameters are present.
      */
-    if (!serverSeed || !clientSeed || !nonce || !dropColumnStr) {
+    if (!roundId) {
+        return NextResponse.json(
+            { error: 'Missing roundId' },
+            { status: 400 }
+        );
+    }
+    if (!serverSeed || !clientSeed || !nonce || !dropColumnStr || !roundId) {
         return NextResponse.json(
             { error: 'Missing required query parameters.' },
             { status: 400 }
         );
     }
+
 
     try {
         /**
@@ -64,21 +75,41 @@ export async function GET(request: Request) {
 
         // 4c. Create the deterministic PRNG from the master seed.
         const prng = seedPRNG(combinedSeed);
+        // console.log("prng ", prng);
 
         // 4d. Run the game engine to get the final path, hash, and bin.
         const { pegMapHash, binIndex, path } = runPlinkoGame(prng, dropColumn);
+        const computedPath = JSON.stringify(path);
+        console.log("computedPath ", computedPath);
+        const originalRound = await prisma.round.findUnique({
+            where: {
+                id: roundId,
+            },
+        })
+        const storedPath = JSON.stringify(originalRound?.pathJson);
+        console.log("storedPath ", storedPath);
+        // console.log("OriginalRound", originalRound);
+        if (originalRound?.commitHex === commitHex && originalRound?.combinedSeed === combinedSeed && originalRound?.pegMapHash === pegMapHash && computedPath === storedPath) {
+            /**
+             * 5. Return all computed values for verification.
+             * The client-side verifier page will display these results.
+             */
+            return NextResponse.json({
+                commitHex,
+                combinedSeed,
+                pegMapHash,
+                binIndex,
+                path, // Include the path for a visual replay
+            });
+        }
+        else {
+            return NextResponse.json(
+                { error: "Cannot Verify" },
+                { status: 400 },
+            );
+        }
 
-        /**
-         * 5. Return all computed values for verification.
-         * The client-side verifier page will display these results.
-         */
-        return NextResponse.json({
-            commitHex,
-            combinedSeed,
-            pegMapHash,
-            binIndex,
-            path, // Include the path for a visual replay
-        });
+
 
     } catch (error) {
         console.error('Verify Error:', error);
