@@ -1,10 +1,10 @@
-# Daphnis Labs - Full-Stack Developer Intern (Plinko Lab)
+# Plinko Lab - Provable Fair Game
 
 This is a take-home assignment to build a provably-fair, interactive Plinko game. The project is built using the Next.js App Router, with API routes serving as the backend and Prisma/SQLite for the database.
 
 ## 🚀 Live Links
 
-* **Live App:** `https://plinko-lab-388c.vercel.app/
+* **Live App:** https://plinko-lab-388c.vercel.app/
 
 ---
 
